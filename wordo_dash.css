@@ -1,0 +1,14 @@
+#main-title {
+	text-align: center;
+	font-family: "Helvetica", Times, san-serif;
+	color: #225ea8;
+}
+
+
+.word:hover .circle {
+	fill-opacity: 0.85;
+}
+
+.selected .circle {
+	fill-opacity: 0.85;
+}
