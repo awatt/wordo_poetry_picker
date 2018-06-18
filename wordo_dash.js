@@ -130,35 +130,35 @@ let words = [
   "him",
   "lust",
   "his",
-  // "ly",
-  // "his",
-  // "ly",
-  // "honey",
-  // "ly",
-  // "hot",
-  // "ly",
-  // "how",
-  // "mad",
-  // "I",
-  // "man",
-  // "I",
-  // "me",
-  // "I",
-  // "me",
-  // "I",
-  // "me",
-  // "if",
-  // "mean",
-  // "in",
-  // "meat",
-  // "in",
-  // "men",
-  // "in",
-  // "milk",
-  // "ing",
-  // "mist",
-  // "ing",
-  // "moan",
+  "ly",
+  "his",
+  "ly",
+  "honey",
+  "ly",
+  "hot",
+  "ly",
+  "how",
+  "mad",
+  "I",
+  "man",
+  "I",
+  "me",
+  "I",
+  "me",
+  "I",
+  "me",
+  "if",
+  "mean",
+  "in",
+  "meat",
+  "in",
+  "men",
+  "in",
+  "milk",
+  "ing",
+  "mist",
+  "ing",
+  "moan",
   // "ing",
   // "moon",
   // "ing",
@@ -344,14 +344,18 @@ function renderChart(){
 
   let radiusScale = d3.scaleSqrt()
             .domain([1, d3.max(wordData,function(el){ return el.length})])
-            .range([11,37])
+            .range([11,30])
 
-let forceX = d3.forceX(width/2),
-    forceY = d3.forceY(height/2),
-    forceRadial = d3.forceRadial(height/2.5,width/2,height/2),
-    isRadial = false,
-    selectedFilter = function(el){ return el.selected === true },
-    unselectedFilter = function(el){ return el.selected === false }
+  let rectWidthScale = d3.scaleLinear()
+            .domain([1, d3.max(wordData,function(el){ return el.length})])
+            .range([20,60])
+
+  let forceX = d3.forceX(width/2),
+      forceY = d3.forceY(height/2),
+      forceRadial = d3.forceRadial(height/2.5,width/2,height/2),
+      isRadial = false,
+      selectedFilter = function(el){ return el.selected === true },
+      unselectedFilter = function(el){ return el.selected === false }
 
 
   let simulation = d3.forceSimulation()
@@ -428,21 +432,39 @@ let forceX = d3.forceX(width/2),
             }
           })
 
-  let circle = node        
-        .append("circle")
-        .attr("class", "circle")
-        .attr("r", function(d){ 
-          return radiusScale(d.length);
-          })
-        .attr("fill", function(d){ return colors[d.length % 6]})
+  let widthScale = function(length){
+    return  lengthlength*8;
+  }
+
+  let textWidth = [];
+
+  //to calculate text widths - immediately stripped out of dom and re-rendered
+  let dummyLabel = node        
+        .append("text")
+        .style("font-size", "14px")
+        .style("font-weight","bold")
+        .text(function(d){ return d.word })
+        .each(function(d,i) {
+            var thisWidth = this.getComputedTextLength()
+            textWidth.push(thisWidth)
+            this.remove() // remove them just after displaying them
+        })        
+
+  let rect = node        
+        .append("rect")
+        .attr("class", "rect")
+        .attr("width", function(d,i) { return textWidth[i] + 16 })
+        .attr("height", 26)
+        .style("fill", function(d){ return colors[d.length % 6]})
         .attr("fill-opacity", 0.3)
+        .style("border-radius", 20) 
 
   let label = node        
         .append("text")
         .attr("class", "label")
-        .attr("text-anchor", "middle")
-        .attr("transform", "translate(0,3)")
-        .style("font-size", "13px")
+        .style("text-anchor", "middle")
+        .attr("transform", function(d,i) { return `translate(${textWidth[i]/2 + 8},17)` })
+        .style("font-size", "14px")
         .style("color", "black")
         .style("font-weight","bold")
         .text(function(d){ return d.word })
@@ -452,17 +474,21 @@ let forceX = d3.forceX(width/2),
 
  function ticked() {
     node
-      .attr("transform", d => {
+      .attr("transform", function(d) {
         return 'translate(' + [d.x, d.y] + ')';
       })
     node
-      .attr("transform", d => {
-        let radius = radiusScale(d.length);
-        d.x = Math.max(radius, Math.min(width - radius, d.x));
-        d.y = Math.max(radius, Math.min(height - radius, d.y));        
+      .attr("transform", function(d,i) {
+        // let radius = radiusScale(d.length);
+        let widthOffset = textWidth[i],
+            heightOffset = 26
+        d.x = Math.max(widthOffset, Math.min(width - widthOffset, d.x));
+        d.y = Math.max(heightOffset, Math.min(height - heightOffset, d.y));        
         return 'translate(' + [d.x, d.y] + ')';
       })
   }
+
+
 
 };
 

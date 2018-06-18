@@ -5,10 +5,10 @@
 }
 
 
-.word:hover .circle {
+.word:hover .rect {
 	fill-opacity: 0.85;
 }
 
-.selected .circle {
+.selected .rect {
 	fill-opacity: 0.85;
 }
